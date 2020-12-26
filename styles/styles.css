@@ -4,15 +4,13 @@
     width: min-content;
 }
 
-#myCanvas{
-    background-color: rgb(199, 199, 226);
-    float: left;
-}
+
 
 #drowLineButton{
     width: min-content;
 }
 
-#myCanvas{
+#mySVG{
+    background-color: darkgoldenrod;
     
 }

@@ -1,6 +1,10 @@
 export default class MapObject{
-    constructor(context){
-        this.context = context;
+
+    static nr = 0;
+
+    constructor(){
+        MapObject.nr += 1;
+        this.id = MapObject.nr;
     }
 
     draw(){
