@@ -7,6 +7,8 @@ const INFO_DIV2 = document.getElementById("infoDiv2");
 
 var svgCanvas = document.getElementById("mySVG");
 var viewPort =  svgCanvas.querySelector('.svg-pan-zoom_viewport');
+
+
 svgPanZoom(svgCanvas, {
     viewportSelector: viewPort
 });
@@ -91,20 +93,22 @@ svgCanvas.addEventListener("click", function (evt) {
     showInfo();
 }, false);
 
+function showInfo(){
+    let str = "Num of obj = " + objArr.length;
+
+    INFO_DIV.innerHTML = str;
+}
+
+
+
+//-------------------------------------------------------------------------------------------
+
 function getMousePos(cnv, evt){
     var rect = cnv.getBoundingClientRect();
     return {
       x: evt.clientX - rect.left,
       y: evt.clientY - rect.top
     };
-}
-
-
-
-function showInfo(){
-    let str = "Num of obj = " + objArr.length;
-
-    INFO_DIV.innerHTML = str;
 }
 
 function getTransformMatrix(element){
@@ -125,5 +129,3 @@ function transformPoints(point, matrix){
     let x = (point.x - matrix.c*y - matrix.e)/matrix.a;
     return {x:x, y:y};
 }
-
-
