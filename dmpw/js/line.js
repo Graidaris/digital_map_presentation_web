@@ -32,7 +32,7 @@ export default class Line extends MapObject{
     draw(){
         return `
         <line 
-        id="Line_${this.id}"
+        id="l${this.id}"
         x1="${this.coord.x1}" y1="${this.coord.y1}" 
         x2="${this.coord.x2}" y2="${this.coord.y2}" 
         stroke-width="3" stroke="rgb(0,0,0)"        
