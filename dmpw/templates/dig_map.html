@@ -8,10 +8,12 @@
 {% endblock %}
 
 {% block content %}
+
     <div id="container">        
         <div id="options">
             <div id="infoDiv"></div>
             <div id="infoDiv2"></div>
+            
             <button id="drowLineButton">Line</button>
             <button>some1</button>
             <button>some1</button>
@@ -19,10 +21,23 @@
             <button>some1</button>
             <button>some1</button>
             <button id="testBut1">Show attr</button>
+            <div id="layers">
+                <span>Layers</span>
+                {% for l_name in layers_names %}                
+                <div id="lcheck_{{ l_name }}">
+                    <input type="checkbox" id="{{ l_name }}" name="{{ l_name }}">
+                    <label for="{{ l_name }}">{{ l_name }}</label>
+                </div>
+                {% endfor %}
+            </div>
+
         </div>
         <svg id="mySVG" xmlns="http://www.w3.org/2000/svg" height="100%" width="100%">
             <g class="svg-pan-zoom_viewport" >
                 <line x1="0" y1="0" x2="1000" y2="1000" stroke-width="0" stroke="rgb(0,0,0)"></line>
+
+                
+
             </g>
         </svg>
     </div>
