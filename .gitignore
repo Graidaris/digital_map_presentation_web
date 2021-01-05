@@ -1,3 +1,6 @@
 venv/*
 test.py
 lab1.sqlite
+__pycashe__/*
+.vscode/*
+client/data_bases/*
