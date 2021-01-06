@@ -1,5 +1,4 @@
 import os
-import re
 
 from dmpw import app
 from flask import render_template, request, flash, redirect
@@ -45,15 +44,20 @@ def map(filename):
     dbext.init_db()
     dbext.extract_geometry_column_name()
 
-    characters_to_remove = '(),\''
-    pattern = f'[{characters_to_remove}]'
-
     names = []
     for name in dbext.geometry_column_name:
-        add_name = re.sub(pattern, "", str(name))
+        add_name = DB_Extractor.del_char(name)
         names.append(add_name)
-
-    return render_template("dig_map.html", layers_names=names)
+            
+    geo_linestrings, geo_poligons, geo_points = dbext.extract_geometry()
+    dbext.get_geometry_statistic()
+    return render_template("dig_map.html",
+                            layers_names=names,
+                            geo_linestrings=geo_linestrings,
+                            geo_poligons=geo_poligons,
+                            geo_points=geo_points,
+                            min_x = dbext.min_x,
+                            min_y = dbext.min_y)
 
 @app.route("/map")
 def defoult_map():
