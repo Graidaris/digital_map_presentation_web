@@ -1,6 +1,8 @@
 import sqlite3
 import re
 import geojson
+import pyproj
+
 
 
 # function that makes query results return lists of dictionaries instead of lists of tuples
@@ -17,6 +19,7 @@ class DB_Extractor:
         self._db = None
         self._cur = None
         self.geometry_column_name = None
+        self.coord_sys_name = None
 
         self.geo_statistic = {}
 
@@ -55,13 +58,17 @@ class DB_Extractor:
                 for row in geom_result:
                     geom = geojson.loads(row['AsGeoJSON(Geometry)'])
                     geo_objects[column_name].append(geom)
+                    print(geom)
         return geo_objects
     
     def extract_geometry(self) -> tuple:
+        self.get_geometry_statistic()
         geo_objects = self.process_geometry()
+
         geo_linestrings = {}
         geo_poligons = {}
         geo_points = {}
+        
         for key in geo_objects.keys():
             array_objects = geo_objects[key]
             for array_object in array_objects:
@@ -80,21 +87,43 @@ class DB_Extractor:
                         geo_points[key].append(array_object['coordinates'])
                     else:
                         geo_points[key] = [array_object['coordinates']]
+
         return (geo_linestrings, geo_poligons, geo_points)
 
-
-
+    
+    
     def get_geometry_statistic(self):
-        result = None
         try:
-            result = self._db.execute(f'SELECT MIN(extent_min_x), MIN(extent_min_y), MAX(extent_max_x), MAX(extent_max_y) FROM geometry_columns_statistics').fetchone()
-            
+            proj4text = self._db.execute(f'SELECT proj4text FROM geom_cols_ref_sys').fetchone()
+            statistic = self._db.execute(f'SELECT MIN(extent_min_x), MIN(extent_min_y), MAX(extent_max_x), MAX(extent_max_y) FROM geometry_columns_statistics').fetchone()
         except sqlite3.OperationalError as e:
-            result = None
             print(e)
+            return
 
-        if result is not None:
-            self.geo_statistic['MIN_X'] = result["MIN(extent_min_x)"]
-            self.geo_statistic['MIN_Y'] = result["MIN(extent_min_y)"]
-            self.geo_statistic['MAX_X'] = result["MAX(extent_max_x)"]
-            self.geo_statistic['MAX_Y'] = result["MAX(extent_max_y)"]
+        p = pyproj.Proj(proj4text['proj4text'])
+        coord_sys_name = proj4text['proj4text'].split(' ')[0].split('=')[1]
+        self.coord_sys_name = coord_sys_name
+
+        if coord_sys_name == 'merc':
+            self.geo_statistic['MIN_X'] = statistic["MIN(extent_min_x)"]
+            self.geo_statistic['MIN_Y'] = statistic["MIN(extent_min_y)"]
+            self.geo_statistic['MAX_X'] = statistic["MAX(extent_max_x)"]
+            self.geo_statistic['MAX_Y'] = statistic["MAX(extent_max_y)"]
+            lon, lat = p(self.geo_statistic['MIN_X'], self.geo_statistic['MIN_Y'], inverse=True)
+            self.geo_statistic['MIN_LON'] = lon
+            self.geo_statistic['MIN_LAT'] = lat
+            lon, lat = p(self.geo_statistic['MAX_X'], self.geo_statistic['MAX_Y'], inverse=True)
+            self.geo_statistic['MAX_LON'] = lon
+            self.geo_statistic['MAX_LAT'] = lat
+        elif coord_sys_name == 'longlat':
+            self.geo_statistic['MIN_LON'] = statistic["MIN(extent_min_x)"]
+            self.geo_statistic['MIN_LAT'] = statistic["MIN(extent_min_y)"]
+            self.geo_statistic['MAX_LON'] = statistic["MAX(extent_max_x)"]
+            self.geo_statistic['MAX_LAT'] = statistic["MAX(extent_max_y)"]
+            min_x, min_y = p(self.geo_statistic['MIN_LON'], self.geo_statistic['MIN_LAT'], inverse=True)
+            self.geo_statistic['MIN_X'] = min_x
+            self.geo_statistic['MIN_Y'] = min_y
+            max_x, max_y = p(self.geo_statistic['MAX_X'], self.geo_statistic['MAX_Y'], inverse=True)
+            self.geo_statistic['MAX_X'] = max_x
+            self.geo_statistic['MAX_Y'] = max_y
+

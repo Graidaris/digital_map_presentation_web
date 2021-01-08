@@ -64,7 +64,8 @@
             </g>
         </svg>
     </div>
-
+    Min lot, lan = {{ geo_statistic['MIN_LON'] }}, {{ geo_statistic['MIN_LAT'] }}
+    Max lot, lan = {{ geo_statistic['MAX_LON'] }}, {{ geo_statistic['MAX_LAT'] }}
 
     <script src="{{ url_for('static', filename = 'js/map_view.js') }}" type="module" crossorigin="anonymous"></script>
 {% endblock %}

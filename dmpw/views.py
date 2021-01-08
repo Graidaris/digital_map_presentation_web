@@ -51,7 +51,7 @@ def map(filename):
         names.append(add_name)
             
     geo_linestrings, geo_poligons, geo_points = dbext.extract_geometry()
-    dbext.get_geometry_statistic()
+
     constanta = 0
     return render_template("dig_map.html",
                             layers_names=names,
