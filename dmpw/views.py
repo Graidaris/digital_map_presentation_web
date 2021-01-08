@@ -34,7 +34,8 @@ def index():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             return redirect(f'/map/{filename}')
         
-    return render_template("index.html")    
+    files_names = [f for f in os.listdir(app.config['UPLOAD_FOLDER']) if os.path.isfile(os.path.join(app.config['UPLOAD_FOLDER'], f))]
+    return render_template("index.html",files_names=files_names)    
 
 
 @app.route("/map/<filename>")
@@ -51,13 +52,14 @@ def map(filename):
             
     geo_linestrings, geo_poligons, geo_points = dbext.extract_geometry()
     dbext.get_geometry_statistic()
+    constanta = 0
     return render_template("dig_map.html",
                             layers_names=names,
                             geo_linestrings=geo_linestrings,
                             geo_poligons=geo_poligons,
                             geo_points=geo_points,
-                            min_x = dbext.min_x,
-                            min_y = dbext.min_y)
+                            geo_statistic = dbext.geo_statistic,
+                            constanta=constanta)
 
 @app.route("/map")
 def defoult_map():

@@ -10,7 +10,7 @@ body{
     float: left;
     width: 200px;
     position: fixed;
-
+    margin: 10px;
     z-index: 10;
 }
 

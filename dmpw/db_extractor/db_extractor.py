@@ -18,8 +18,7 @@ class DB_Extractor:
         self._cur = None
         self.geometry_column_name = None
 
-        self.min_x = 0
-        self.min_y = 0
+        self.geo_statistic = {}
 
     def init_db(self) -> None:
         if self.db_path is not None:
@@ -86,6 +85,16 @@ class DB_Extractor:
 
 
     def get_geometry_statistic(self):
-        result = self._db.execute(f'SELECT MIN(extent_min_x), MIN(extent_min_y) FROM geometry_columns_statistics').fetchone()
-        self.min_x = result["MIN(extent_min_x)"]
-        self.min_y = result["MIN(extent_min_y)"]
+        result = None
+        try:
+            result = self._db.execute(f'SELECT MIN(extent_min_x), MIN(extent_min_y), MAX(extent_max_x), MAX(extent_max_y) FROM geometry_columns_statistics').fetchone()
+            
+        except sqlite3.OperationalError as e:
+            result = None
+            print(e)
+
+        if result is not None:
+            self.geo_statistic['MIN_X'] = result["MIN(extent_min_x)"]
+            self.geo_statistic['MIN_Y'] = result["MIN(extent_min_y)"]
+            self.geo_statistic['MAX_X'] = result["MAX(extent_max_x)"]
+            self.geo_statistic['MAX_Y'] = result["MAX(extent_max_y)"]

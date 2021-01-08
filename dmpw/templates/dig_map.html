@@ -21,6 +21,9 @@
             <button>some1</button>
             <button>some1</button>
             <button id="testBut1">Show attr</button>
+            <form action="/index">
+                <input type="submit" value="Go index" style="background-color: brown;"/>
+            </form>
             <div id="layers">
                 <span>Layers</span>
                 {% for l_name in layers_names %}                
@@ -37,7 +40,7 @@
                 {% for layer_name, coords in geo_linestrings.items() %}
                     {% for coords1 in coords %}
                         {% for points in coords1 %}
-                <polyline points="{% for point in points %}{{ point[0]-min_x }}, {{ point[1]-min_y }} {% endfor %}" style="fill:none;stroke:black;stroke-width:3"/>
+                <polyline points="{% for point in points %}{{ (point[0]-geo_statistic['MIN_X']) }}, {{ (point[1]-geo_statistic['MIN_Y']) }} {% endfor %}" style="fill:none;stroke:black;stroke-width:3"/>
                         {% endfor %}
                     {% endfor %}
                 {% endfor %}
@@ -46,13 +49,22 @@
                     {% for coords1 in coords %}
                         {% for coords2 in coords1 %}
                             {% for points in coords2 %}
-                <polygon  points="{% for point in points %}{{ point[0]-min_x }}, {{ point[1]-min_y }} {% endfor %}" style="fill:blue;stroke:blue;stroke-width:3"/>
+                <polygon  points="{% for point in points %}{{ (point[0]-geo_statistic['MIN_X']) }}, {{ (point[1]-geo_statistic['MIN_Y']) }} {% endfor %}" style="fill:blue;stroke:blue;stroke-width:3"/>
                             {% endfor %}
                         {% endfor %}
+                    {% endfor %}
+                {% endfor %}
+
+                {% for layer_name, coords in geo_points.items() %}
+                    {% for points in coords %}
+                <circle cx="{{ (points[0]-geo_statistic['MIN_X'])*constanta }}" cy="{{ (points[1]-geo_statistic['MIN_Y'])*constanta }}" r="0.7"/>
+
                     {% endfor %}
                 {% endfor %}
             </g>
         </svg>
     </div>
+
+
     <script src="{{ url_for('static', filename = 'js/map_view.js') }}" type="module" crossorigin="anonymous"></script>
 {% endblock %}

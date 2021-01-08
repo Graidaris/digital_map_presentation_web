@@ -4,9 +4,19 @@
 {% endblock %}
 
 {% block content %}
-<h1>Upload new File</h1>
+    <h1>Upload new File</h1>
     <form method=post enctype=multipart/form-data>
         <input type=file name=file>
         <input type=submit value=Upload>
     </form>
+    <h1>Uploded files</h1>
+    {% for name in files_names %}
+        <div>
+            <form action="/map/{{ name }}">
+                <span>{{ name }}</span>
+                <input type="submit" value="Open" />
+            </form>
+        </div>
+    {%endfor%}
+
 {% endblock %}
