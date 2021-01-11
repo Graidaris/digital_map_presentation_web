@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>{{ filename }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename = 'styles/styles.css') }}">
+    <link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/1.1/js/dojo/dijit/themes/tundra/tundra.css">
+    <script type="text/javascript" src="http://serverapi.arcgisonline.com/jsapi/arcgis/?v=1.1"></script>
+
+    
+{% endblock %}
+
+{% block content %}
+
+    <div id="info">
+        <div id="draw-tools"> 
+            <span>Draw tools</span>
+            <button id="Point">Point</button>
+            <button id="Multipoint">Multipoint</button>
+            <button id="Line">Line</button>
+            <button id="Polyline">Polyline</button>
+            <button id="Polygon">Polygon</button>
+            <button onclick="addLineToMap()">Click me</button>
+            <button onclick="addLineToMap2()">Click me</button>
+        </div>
+        <div id="layers">
+            <span>Layers</span>
+            {% for layer_name in layers_names %}
+            <div id="lcheck_{{ layer_name }}">
+                <input type="checkbox" id="{{ layer_name }}" name="{{ layer_name }}">
+                <label for="{{ layer_name }}">{{ layer_name }}</label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div id="viewDiv"></div>
+    <script src="{{ url_for('static', filename = 'js/dig_map.js') }}" ></script> 
+{% endblock %}

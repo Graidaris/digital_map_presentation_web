@@ -53,7 +53,8 @@ def map(filename):
     geo_linestrings, geo_poligons, geo_points = dbext.extract_geometry()
 
     constanta = 0
-    return render_template("dig_map.html",
+    return render_template("map.html",
+                            filename=filename,
                             layers_names=names,
                             geo_linestrings=geo_linestrings,
                             geo_poligons=geo_poligons,
@@ -63,4 +64,4 @@ def map(filename):
 
 @app.route("/map")
 def defoult_map():
-    return render_template("dig_map.html")
+    return render_template("map.html")
