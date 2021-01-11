@@ -38,7 +38,7 @@
         <svg id="mySVG" xmlns="http://www.w3.org/2000/svg" height="100%" width="100%">
             <g class="svg-pan-zoom_viewport" >
                 {% for layer_name, coords in geo_linestrings.items() %}
-                    {% for coords1 in coords %}
+                    {% for coords1 in coords['merc'] %}
                         {% for points in coords1 %}
                 <polyline points="{% for point in points %}{{ (point[0]-geo_statistic['MIN_X']) }}, {{ (point[1]-geo_statistic['MIN_Y']) }} {% endfor %}" style="fill:none;stroke:black;stroke-width:3"/>
                         {% endfor %}
@@ -46,7 +46,7 @@
                 {% endfor %}
 
                 {% for layer_name, coords in geo_poligons.items() %}
-                    {% for coords1 in coords %}
+                    {% for coords1 in coords['merc'] %}
                         {% for coords2 in coords1 %}
                             {% for points in coords2 %}
                 <polygon  points="{% for point in points %}{{ (point[0]-geo_statistic['MIN_X']) }}, {{ (point[1]-geo_statistic['MIN_Y']) }} {% endfor %}" style="fill:blue;stroke:blue;stroke-width:3"/>
@@ -56,7 +56,7 @@
                 {% endfor %}
 
                 {% for layer_name, coords in geo_points.items() %}
-                    {% for points in coords %}
+                    {% for points in coords['merc'] %}
                 <circle cx="{{ (points[0]-geo_statistic['MIN_X'])*constanta }}" cy="{{ (points[1]-geo_statistic['MIN_Y'])*constanta }}" r="0.7"/>
 
                     {% endfor %}
@@ -66,6 +66,10 @@
     </div>
     Min lot, lan = {{ geo_statistic['MIN_LON'] }}, {{ geo_statistic['MIN_LAT'] }}
     Max lot, lan = {{ geo_statistic['MAX_LON'] }}, {{ geo_statistic['MAX_LAT'] }}
+
+    Min X, Y = {{ geo_statistic['MIN_X'] }}, {{ geo_statistic['MIN_Y'] }}
+    Max C, Y = {{ geo_statistic['MAX_X'] }}, {{ geo_statistic['MAX_Y'] }}
+    
 
     <script src="{{ url_for('static', filename = 'js/map_view.js') }}" type="module" crossorigin="anonymous"></script>
 {% endblock %}
