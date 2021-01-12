@@ -1,23 +1,24 @@
  #info {
-        top: 20px;
-        color: #444;
-        height: auto;
-        font-family: arial;
-        right: 20px;
-        margin: 5px;
-        padding: 10px;
-        position: absolute;
-        width: 115px;
-        z-index: 40;
-        border: solid 2px #666;
-        border-radius: 4px;
-        background-color: #fff;
-      }
-      html, body, #mapDiv {
-        padding:0;
-        margin:0;
-        height:100%;
-      }
-      button {
-        display: block;
-      }
+  top: 20px;
+  color: #444;
+  height: auto;
+  font-family: arial;
+  right: 20px;
+  margin: 5px;
+  padding: 10px;
+  position: absolute;
+  width: 150px;
+  z-index: 40;
+  border: solid 2px #666;
+  border-radius: 4px;
+  background-color: #fff;
+}
+ html, body, #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+button {
+  display: block;
+}

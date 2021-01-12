@@ -1,59 +1,108 @@
-dojo.require("esri.map");
-var map; 
 
-function init() {
-    map = new esri.Map("viewDiv");
-    
-    map.addLayer(
-            new esri.layers.ArcGISTiledMapServiceLayer("http://server.arcgisonline.com/ArcGIS/rest/services/ESRI_Imagery_World_2D/MapServer")
-        );
+var addLineToMap;
+var addPolygonToMap;
+var setCenterMap;
+
+var objects = {};
+
+
+function showObjects(){
+    console.log(objects);
 }
 
-function addLineToMap() {
-    let lon1= -122.44400024414062;
-    let lat1= 37.75382995605469;
-    let lon2= -112.44400024414062;
-    let lat2= 27.75382995605469;
-       var point1 = new esri.geometry.Point(lon1, lat1, map.spatialReference);
-       var point2 = new esri.geometry.Point(lon2, lat2, map.spatialReference);
-       var line = new esri.geometry.Polyline(map.spatialReference);
-       line.addPath([point1, point2]);
-       var lineSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255,0,0,0.5]),3);
-       var pointSymbol = new esri.symbol.SimpleMarkerSymbol().setColor(new dojo.Color([255,0,0, 0.5]));
-       map.graphics.add(new esri.Graphic(point1, pointSymbol));
-       map.graphics.add(new esri.Graphic(point2, pointSymbol));
-       map.graphics.add(new esri.Graphic(line, lineSymbol))
- 
+function hideLayer(ch_box_id, layer_name){ 
+    let check_box = document.getElementById(ch_box_id);
+    if (check_box.checked){
+        objects[layer_name].forEach(element => element.visible = true);
+    }else{
+        objects[layer_name].forEach(element => element.visible = false);
+    }
 }
 
-function addLineToMap2() {
-    var simpleLineSymbol = {
-        type: "simple-line",
-        color: [226, 119, 40], // orange
-        width: 2
-      };
 
-    var lineSymbol = new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID, new dojo.Color([255,0,0,0.5]),3);
+require([
+    "esri/Map",
+    "esri/views/MapView",
+    "esri/Graphic",
+    "esri/layers/GraphicsLayer"
+    ], function(Map, MapView, Graphic, GraphicsLayer) {
 
-   
-
-    var polyline = {
-        type: "polyline",
-        paths: [
-            [-118.821527826096, 34.0139576938577],
-            [-122.814893761649, 34.0080602407843],
-            [-152.808878330345, 34.0016642996246]
-        ]
-    };
-    
-    var polylineGraphic = new  esri.Graphic({
-        geometry: polyline,
-        symbol: lineSymbol
+    var map = new Map({
+        basemap: "satellite"
     });
 
-      map.graphics.add(polylineGraphic);
- 
-}
+    var view = new MapView({
+        container: "viewDiv",
+        map: map,
+        zoom: 3
+    });
+
+    var graphicsLayer = new GraphicsLayer();
+    map.add(graphicsLayer);
+
+
+    addLineToMap = function (name_layer, paths){
+
+        var simpleLineSymbol = {
+            type: "simple-line",
+            color: [226, 119, 40], // orange
+            width: 2
+        };
+
+        var polyline = {
+            type: "polyline",
+            paths: paths
+        };
+
+        var polylineGraphic = new Graphic({
+            geometry: polyline,
+            symbol: simpleLineSymbol
+        });
+
+       
+        addObjectToDict(name_layer, polylineGraphic);
+        graphicsLayer.add(polylineGraphic);
+
+    }
+
+    addPolygonToMap = function (name_layer, paths){
+        var polygon = {
+            type: "polygon",
+            rings: paths
+          };
    
+        var simpleFillSymbol = {
+            type: "simple-fill",
+            color: [0, 0, 255, 0.8],
+            outline: {
+                color: [255, 255, 255],
+                width: 1
+            }
+        };
    
-dojo.addOnLoad(init);
+        var polygonGraphic = new Graphic({
+            geometry: polygon,
+            symbol: simpleFillSymbol
+        });
+        
+        addObjectToDict(name_layer, polygonGraphic);
+        graphicsLayer.add(polygonGraphic);
+    }
+
+
+    setCenterMap = function(lon, lat){
+        view.center = [lon, lat];
+        view.zoom = 15
+    }
+
+    
+
+    function addObjectToDict(name_layer, obj){
+        if (name_layer in objects){
+            objects[name_layer].push(obj);
+        }else{
+            objects[name_layer] = [obj]
+        }
+    }
+
+});

@@ -19,7 +19,10 @@ class DB_Extractor:
         self._db = None
         self._cur = None
         self.geometry_column_name = None
+
         self.native_coord_sys_name = None
+        self.other_coord_sys_name = None
+
         self.p = None
 
         self.geo_statistic = {}
@@ -83,6 +86,13 @@ class DB_Extractor:
 
         return coords
 
+    def process_MultiPolygon(self, coords):
+        for coords1 in coords:
+            for coords2 in coords1:
+                coords2[0], coords2[1] = self.invers_coord_system(coords2[0], coords2[1])
+
+        return coords
+
 
     def extract_geometry(self) -> tuple:
         self.init_proj()
@@ -99,17 +109,24 @@ class DB_Extractor:
                 if array_object['type'] == 'LineString' or array_object['type'] == 'MultiLineString':
                     if key in geo_linestrings:
                         geo_linestrings[key][self.native_coord_sys_name].append(array_object['coordinates'])
+                        geo_linestrings[key][self.other_coord_sys_name].append(self.process_MultiLineString(array_object['coordinates']))
+
                     else:
                         geo_linestrings[key] = {
-                            self.native_coord_sys_name: [array_object['coordinates']]
+                            self.native_coord_sys_name: [array_object['coordinates']],
+                            self.other_coord_sys_name: [self.process_MultiLineString(array_object['coordinates'])]
                             }
 
                 elif array_object['type'] == 'Polygon' or array_object['type'] == 'MultiPolygon':
                     if key in geo_poligons:
-                        geo_poligons[key][self.native_coord_sys_name].append(array_object['coordinates'])
+                        geo_poligons[key][self.native_coord_sys_name].append(array_object['coordinates'][0])
+                        geo_poligons[key][self.other_coord_sys_name].append(self.process_MultiPolygon(array_object['coordinates'][0]))
+
                     else:
                         geo_poligons[key] = {
-                            self.native_coord_sys_name: [array_object['coordinates']]
+                            self.native_coord_sys_name: [array_object['coordinates'][0]],
+                            self.other_coord_sys_name: [self.process_MultiPolygon(array_object['coordinates'][0])]
+
                             }
 
                 elif array_object['type'] == 'Point' or array_object['type'] == 'MultiPoint':
@@ -133,7 +150,7 @@ class DB_Extractor:
         
 
         if self.native_coord_sys_name == 'merc':
-
+            self.other_coord_sys_name = 'longlat'
             self.geo_statistic['MIN_X'] = statistic["MIN(extent_min_x)"]
             self.geo_statistic['MIN_Y'] = statistic["MIN(extent_min_y)"]
             self.geo_statistic['MAX_X'] = statistic["MAX(extent_max_x)"]
@@ -146,7 +163,7 @@ class DB_Extractor:
             self.geo_statistic['MAX_LAT'] = lat
 
         elif self.native_coord_sys_name == 'longlat':
-
+            self.other_coord_sys_name = 'merc'
             self.geo_statistic['MIN_LON'] = statistic["MIN(extent_min_x)"]
             self.geo_statistic['MIN_LAT'] = statistic["MIN(extent_min_y)"]
             self.geo_statistic['MAX_LON'] = statistic["MAX(extent_max_x)"]

@@ -1,7 +1,7 @@
 import os
 
 from dmpw import app
-from flask import render_template, request, flash, redirect
+from flask import render_template, request, flash, redirect, jsonify
 from werkzeug.utils import secure_filename
 
 from .db_extractor.db_extractor import DB_Extractor
@@ -52,16 +52,27 @@ def map(filename):
             
     geo_linestrings, geo_poligons, geo_points = dbext.extract_geometry()
 
-    constanta = 0
     return render_template("map.html",
                             filename=filename,
                             layers_names=names,
-                            geo_linestrings=geo_linestrings,
-                            geo_poligons=geo_poligons,
-                            geo_points=geo_points,
-                            geo_statistic = dbext.geo_statistic,
-                            constanta=constanta)
+                            geo_statistic = dbext.geo_statistic
+                            )
 
 @app.route("/map")
 def defoult_map():
     return render_template("map.html")
+
+@app.route('/getGeometry', methods=['GET'])
+def getGeometry():
+    filepath = os.path.join(app.config['UPLOAD_FOLDER'], 'lab1.sqlite')
+    dbext = DB_Extractor(db_path=filepath)
+    dbext.init_db()
+    dbext.extract_geometry_column_name()
+
+    geo_linestrings, geo_poligons, geo_points = dbext.extract_geometry()
+    return jsonify(
+        geo_linestrings=geo_linestrings,
+        geo_poligons=geo_poligons,
+        geo_points=geo_points,
+        geo_statistic=dbext.geo_statistic
+    )
