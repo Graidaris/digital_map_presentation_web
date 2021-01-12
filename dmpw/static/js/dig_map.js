@@ -41,11 +41,11 @@ require([
     map.add(graphicsLayer);
 
 
-    addLineToMap = function (name_layer, paths){
+    addLineToMap = function (name_layer, paths, color){
 
         var simpleLineSymbol = {
             type: "simple-line",
-            color: [226, 119, 40], // orange
+            color: color, // orange
             width: 2
         };
 
@@ -65,15 +65,15 @@ require([
 
     }
 
-    addPolygonToMap = function (name_layer, paths){
+    addPolygonToMap = function (name_layer, paths, color){
         var polygon = {
             type: "polygon",
             rings: paths
           };
-   
+          color.push(0.8)
         var simpleFillSymbol = {
             type: "simple-fill",
-            color: [0, 0, 255, 0.8],
+            color: color,
             outline: {
                 color: [255, 255, 255],
                 width: 1

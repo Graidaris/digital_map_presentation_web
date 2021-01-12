@@ -21,14 +21,38 @@ function processResult(results){
         );
 }
 
+
+var color;
+var oldKey = '';
+
 function processLines(lines){
     Object.entries(lines).forEach(([key, value]) => {
-      value['longlat'].forEach(element => addLineToMap(key, element));
-     });    
+        if (key != oldKey){
+            color = getRandomColor();
+            oldKey = key;
+        }
+
+        value['longlat'].forEach(element => addLineToMap(key, element, color));
+    });    
 }
 
 function processPolygons(lines){
     Object.entries(lines).forEach(([key, value]) => {
-      value['longlat'].forEach(element => addPolygonToMap(key, element));
-     });    
+        if (key != oldKey){
+            color = getRandomColor();
+            oldKey = key;
+        }
+        value['longlat'].forEach(element => addPolygonToMap(key, element, color));
+    });    
+}
+
+function getRandomColor(){
+    let r = getRandomInt(255);
+    let g = getRandomInt(255);
+    let b = getRandomInt(255);
+    return [r,g,b]
+}
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * Math.floor(max));
 }
